@@ -937,11 +937,15 @@ void mz_zip_reader_set_pattern(void *handle, const char *pattern, uint8_t ignore
 
 void mz_zip_reader_set_password(void *handle, const char *password) {
     mz_zip_reader *reader = (mz_zip_reader *)handle;
+    if (!reader)
+        return;
     reader->password = password;
 }
 
 void mz_zip_reader_set_raw(void *handle, uint8_t raw) {
     mz_zip_reader *reader = (mz_zip_reader *)handle;
+    if (!reader)
+        return;
     reader->raw = raw;
 }
 
@@ -980,34 +984,46 @@ int32_t mz_zip_reader_set_recover(void *handle, uint8_t recover) {
 
 void mz_zip_reader_set_encoding(void *handle, int32_t encoding) {
     mz_zip_reader *reader = (mz_zip_reader *)handle;
+    if (!reader)
+        return;
     reader->encoding = encoding;
 }
 
 void mz_zip_reader_set_overwrite_cb(void *handle, void *userdata, mz_zip_reader_overwrite_cb cb) {
     mz_zip_reader *reader = (mz_zip_reader *)handle;
+    if (!reader)
+        return;
     reader->overwrite_cb = cb;
     reader->overwrite_userdata = userdata;
 }
 
 void mz_zip_reader_set_password_cb(void *handle, void *userdata, mz_zip_reader_password_cb cb) {
     mz_zip_reader *reader = (mz_zip_reader *)handle;
+    if (!reader)
+        return;
     reader->password_cb = cb;
     reader->password_userdata = userdata;
 }
 
 void mz_zip_reader_set_progress_cb(void *handle, void *userdata, mz_zip_reader_progress_cb cb) {
     mz_zip_reader *reader = (mz_zip_reader *)handle;
+    if (!reader)
+        return;
     reader->progress_cb = cb;
     reader->progress_userdata = userdata;
 }
 
 void mz_zip_reader_set_progress_interval(void *handle, uint32_t milliseconds) {
     mz_zip_reader *reader = (mz_zip_reader *)handle;
+    if (!reader)
+        return;
     reader->progress_cb_interval_ms = milliseconds;
 }
 
 void mz_zip_reader_set_entry_cb(void *handle, void *userdata, mz_zip_reader_entry_cb cb) {
     mz_zip_reader *reader = (mz_zip_reader *)handle;
+    if (!reader)
+        return;
     reader->entry_cb = cb;
     reader->entry_userdata = userdata;
 }
@@ -1827,16 +1843,22 @@ int32_t mz_zip_writer_copy_from_reader(void *handle, void *reader) {
 
 void mz_zip_writer_set_password(void *handle, const char *password) {
     mz_zip_writer *writer = (mz_zip_writer *)handle;
+    if (!writer)
+        return;
     writer->password = password;
 }
 
 void mz_zip_writer_set_comment(void *handle, const char *comment) {
     mz_zip_writer *writer = (mz_zip_writer *)handle;
+    if (!writer)
+        return;
     writer->comment = comment;
 }
 
 void mz_zip_writer_set_raw(void *handle, uint8_t raw) {
     mz_zip_writer *writer = (mz_zip_writer *)handle;
+    if (!writer)
+        return;
     writer->raw = raw;
 }
 
@@ -1850,27 +1872,35 @@ int32_t mz_zip_writer_get_raw(void *handle, uint8_t *raw) {
 
 void mz_zip_writer_set_aes(void *handle, uint8_t aes) {
     mz_zip_writer *writer = (mz_zip_writer *)handle;
+    if (!writer)
+        return;
     writer->aes = aes;
 }
 
 void mz_zip_writer_set_compress_method(void *handle, uint16_t compress_method) {
     mz_zip_writer *writer = (mz_zip_writer *)handle;
+    if (!writer)
+        return;
     writer->compress_method = compress_method;
 }
 
 void mz_zip_writer_set_compress_level(void *handle, int16_t compress_level) {
     mz_zip_writer *writer = (mz_zip_writer *)handle;
+    if (!writer)
+        return;
     writer->compress_level = compress_level;
 }
 
 void mz_zip_writer_set_follow_links(void *handle, uint8_t follow_links) {
     mz_zip_writer *writer = (mz_zip_writer *)handle;
+    if (!writer)
+        return;
     writer->follow_links = follow_links;
 }
 
 int32_t mz_zip_writer_get_follow_links(void *handle, uint8_t *follow_links) {
     mz_zip_writer *writer = (mz_zip_writer *)handle;
-    if (!follow_links)
+    if (!writer || !follow_links)
         return MZ_PARAM_ERROR;
     *follow_links = writer->follow_links;
     return MZ_OK;
@@ -1878,39 +1908,53 @@ int32_t mz_zip_writer_get_follow_links(void *handle, uint8_t *follow_links) {
 
 void mz_zip_writer_set_store_links(void *handle, uint8_t store_links) {
     mz_zip_writer *writer = (mz_zip_writer *)handle;
+    if (!writer)
+        return;
     writer->store_links = store_links;
 }
 
 void mz_zip_writer_set_zip_cd(void *handle, uint8_t zip_cd) {
     mz_zip_writer *writer = (mz_zip_writer *)handle;
+    if (!writer)
+        return;
     writer->zip_cd = zip_cd;
 }
 
 void mz_zip_writer_set_overwrite_cb(void *handle, void *userdata, mz_zip_writer_overwrite_cb cb) {
     mz_zip_writer *writer = (mz_zip_writer *)handle;
+    if (!writer)
+        return;
     writer->overwrite_cb = cb;
     writer->overwrite_userdata = userdata;
 }
 
 void mz_zip_writer_set_password_cb(void *handle, void *userdata, mz_zip_writer_password_cb cb) {
     mz_zip_writer *writer = (mz_zip_writer *)handle;
+    if (!writer)
+        return;
     writer->password_cb = cb;
     writer->password_userdata = userdata;
 }
 
 void mz_zip_writer_set_progress_cb(void *handle, void *userdata, mz_zip_writer_progress_cb cb) {
     mz_zip_writer *writer = (mz_zip_writer *)handle;
+    if (!writer)
+        return;
     writer->progress_cb = cb;
     writer->progress_userdata = userdata;
 }
 
 void mz_zip_writer_set_progress_interval(void *handle, uint32_t milliseconds) {
     mz_zip_writer *writer = (mz_zip_writer *)handle;
+    if (!writer)
+        return;
     writer->progress_cb_interval_ms = milliseconds;
 }
 
 void mz_zip_writer_set_entry_cb(void *handle, void *userdata, mz_zip_writer_entry_cb cb) {
     mz_zip_writer *writer = (mz_zip_writer *)handle;
+    if (!writer)
+        return;
     writer->entry_cb = cb;
     writer->entry_userdata = userdata;
 }
