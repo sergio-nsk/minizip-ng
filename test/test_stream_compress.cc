@@ -20,6 +20,9 @@
 #ifdef HAVE_LZMA
 #  include "mz_strm_lzma.h"
 #endif
+#ifdef HAVE_PPMD
+#  include "mz_strm_ppmd.h"
+#endif
 #ifdef HAVE_ZLIB
 #  include "mz_strm_zlib.h"
 #endif
@@ -134,6 +137,11 @@ TEST(stream, bzip) {
 #ifdef HAVE_LZMA
 TEST(stream, lzma) {
     return test_compress("lzma", mz_stream_lzma_create);
+}
+#endif
+#ifdef HAVE_PPMD
+TEST(stream, ppmd) {
+    return test_compress("ppmd", mz_stream_ppmd_create);
 }
 #endif
 #ifdef HAVE_ZLIB

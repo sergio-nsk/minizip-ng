@@ -32,6 +32,9 @@
 #ifdef HAVE_PKCRYPT
 #  include "mz_strm_pkcrypt.h"
 #endif
+#ifdef HAVE_PPMD
+#  include "mz_strm_ppmd.h"
+#endif
 #ifdef HAVE_WZAES
 #  include "mz_strm_wzaes.h"
 #endif
@@ -41,7 +44,6 @@
 #ifdef HAVE_ZSTD
 #  include "mz_strm_zstd.h"
 #endif
-
 #include "mz_zip.h"
 
 #include <ctype.h> /* tolower */
@@ -715,8 +717,9 @@ static int32_t mz_zip_entry_write_header(void *stream, uint8_t local, mz_zip_fil
             if ((file_info->flag & MZ_ZIP_FLAG_ENCRYPTED) && (file_info->aes_version))
                 version_needed = 51;
 #endif
-#if defined(HAVE_LZMA) || defined(HAVE_LIBCOMP)
+#if defined(HAVE_LZMA) || defined(HAVE_LIBCOMP) || defined(HAVE_PPMD)
             if ((file_info->compression_method == MZ_COMPRESS_METHOD_LZMA) ||
+                (file_info->compression_method == MZ_COMPRESS_METHOD_PPMD) ||
                 (file_info->compression_method == MZ_COMPRESS_METHOD_XZ))
                 version_needed = 63;
 #endif
@@ -1704,6 +1707,9 @@ static int32_t mz_zip_entry_open_int(void *handle, uint8_t raw, int16_t compress
 #if defined(HAVE_LZMA) || defined(HAVE_LIBCOMP)
     case MZ_COMPRESS_METHOD_XZ:
 #endif
+#ifdef HAVE_PPMD
+    case MZ_COMPRESS_METHOD_PPMD:
+#endif
 #ifdef HAVE_ZSTD
     case MZ_COMPRESS_METHOD_ZSTD:
 #endif
@@ -1795,6 +1801,15 @@ static int32_t mz_zip_entry_open_int(void *handle, uint8_t raw, int16_t compress
             if (zip->compress_stream) {
                 mz_stream_set_prop_int64(zip->compress_stream, MZ_STREAM_PROP_COMPRESS_METHOD,
                                          zip->file_info.compression_method);
+            }
+        }
+#endif
+#ifdef HAVE_PPMD
+        else if (zip->file_info.compression_method == MZ_COMPRESS_METHOD_PPMD) {
+            zip->compress_stream = mz_stream_ppmd_create();
+            if (zip->compress_stream) {
+                mz_stream_set_prop_int64(zip->compress_stream, MZ_STREAM_PROP_TOTAL_IN_MAX,
+                                         zip->file_info.compressed_size);
             }
         }
 #endif
