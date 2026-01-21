@@ -13,7 +13,14 @@ if(ZLIB-NG_INCLUDE_DIRS)
     endif()
 endif()
 
-find_library(ZLIB-NG_LIBRARY NAMES z-ng libz-ng libz-ng.a zlib-ng zlibstatic-ng)
+if(BUILD_SHARED_LIBS)
+    set(LIB_NAMES z-ng zlib-ng libz-ng)
+else()
+    set(LIB_NAMES zlibstatic-ng libz-ng.a z-ng)
+endif()
+
+find_library(ZLIB-NG_LIBRARY NAMES ${LIB_NAMES})
+
 
 set(ZLIB-NG_LIBRARIES ${ZLIB-NG_LIBRARY})
 set(ZLIB-NG_INCLUDE_DIRS ${ZLIB-NG_INCLUDE_DIRS})
