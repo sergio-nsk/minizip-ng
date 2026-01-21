@@ -14,6 +14,7 @@ These functions provide support for handling common file system operations.
   - [mz_path_remove_extension](#mz_path_remove_extension)
   - [mz_path_get_filename](#mz_path_get_filename)
 - [Directory](#directory)
+  - [mz_dir_has_unsafe_symlink](#mz_dir_has_unsafe_symlink)
   - [mz_dir_make](#mz_dir_make)
 - [File](#file)
   - [mz_file_get_crc](#mz_file_get_crc)
@@ -283,6 +284,31 @@ else
 ```
 
 ## Directory
+
+### mz_dir_has_unsafe_symlink
+
+Checks if any existing component of a path is a symbolic link that escapes a base path. This function is used to prevent symlink-based path traversal attacks during archive extraction.
+
+**Arguments**
+|Type|Name|Description|
+|-|-|-|
+|const char *|path|Path to check|
+|const char *|base_path|Base path that symlinks must not escape|
+
+**Return**
+|Type|Description|
+|-|-|
+|int32_t|[MZ_ERROR](mz_error.md) code, MZ_OK if path is safe, MZ_EXIST_ERROR if an unsafe symlink is found.|
+
+**Example**
+```
+const char *base_path = "/tmp/extract/";
+const char *file_path = "/tmp/extract/subdir/file.txt";
+if (mz_dir_has_unsafe_symlink(file_path, base_path) == MZ_OK)
+    printf("Path is safe to write\n");
+else
+    printf("Path contains unsafe symlink\n");
+```
 
 ### mz_dir_make
 
