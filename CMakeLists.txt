@@ -8,7 +8,7 @@
 cmake_minimum_required(VERSION 3.13)
 
 # Library version
-set(VERSION "4.0.10")
+set(VERSION "4.1.0")
 # API version
 set(SOVERSION "4")
 
@@ -646,11 +646,11 @@ endif()
 if(MZ_COMPAT)
     set(SOVERSION "1")
 
-    list(APPEND MINIZIP_SRC 
+    list(APPEND MINIZIP_SRC
         compat/ioapi.c
         compat/unzip.c
         compat/zip.c)
-    list(APPEND MINIZIP_HDR 
+    list(APPEND MINIZIP_HDR
         compat/ioapi.h
         compat/unzip.h
         compat/zip.h)
