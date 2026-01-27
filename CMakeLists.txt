@@ -738,7 +738,18 @@ if(NOT SKIP_INSTALL_LIBRARIES AND NOT SKIP_INSTALL_ALL)
     target_include_directories(${MINIZIP_TARGET} PUBLIC
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/${MINIZIP_TARGET}>)
 
-    install(TARGETS ${MINIZIP_TARGET} ${MINIZIP_DEP}
+    # Resolve alias targets to their real targets for installation
+    set(MINIZIP_DEP_REAL)
+    foreach(dep_target ${MINIZIP_DEP})
+        get_target_property(alias_target ${dep_target} ALIASED_TARGET)
+        if(alias_target)
+            list(APPEND MINIZIP_DEP_REAL ${alias_target})
+        else()
+            list(APPEND MINIZIP_DEP_REAL ${dep_target})
+        endif()
+    endforeach()
+
+    install(TARGETS ${MINIZIP_TARGET} ${MINIZIP_DEP_REAL}
             EXPORT ${MINIZIP_TARGET}
             INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/${MINIZIP_TARGET}"
             RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
