@@ -287,6 +287,7 @@ int32_t mz_dir_has_unsafe_symlink(const char *path, const char *base_path) {
     size_t alloc_size = 0;
     size_t parent_len = 0;
     size_t pos = 0;
+    size_t symlink_target_size = 1024;
     int32_t err = MZ_OK;
 
     if (!path || *path == 0 || !base_path)
@@ -303,7 +304,7 @@ int32_t mz_dir_has_unsafe_symlink(const char *path, const char *base_path) {
     alloc_size = path_len * 2 + 2;
 
     check_path = (char *)calloc(1, path_len + 1);
-    symlink_target = (char *)calloc(1, path_len + 1);
+    symlink_target = (char *)calloc(1, symlink_target_size);
     combined = (char *)calloc(1, alloc_size);
     resolved = (char *)calloc(1, alloc_size);
 
@@ -329,7 +330,7 @@ int32_t mz_dir_has_unsafe_symlink(const char *path, const char *base_path) {
         /* Check if this existing path component is a symlink */
         if (mz_os_is_symlink(check_path) != MZ_OK)
             continue;
-        if (mz_os_read_symlink(check_path, symlink_target, (int32_t)(path_len + 1)) != MZ_OK) {
+        if (mz_os_read_symlink(check_path, symlink_target, symlink_target_size) != MZ_OK) {
             err = MZ_EXIST_ERROR;
             break;
         }
