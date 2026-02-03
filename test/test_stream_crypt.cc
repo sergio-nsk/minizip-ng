@@ -17,12 +17,26 @@
 #include <gtest/gtest.h>
 
 #include <stdio.h> /* printf, snprintf */
+#include <string>
+#include <vector>
 
 #if defined(_MSC_VER) && (_MSC_VER < 1900)
 #  define snprintf _snprintf
 #endif
 
-static void test_encrypt(const char *path, const char *method, mz_stream_create_cb crypt_create, const char *password) {
+class encrypt_test : public ::testing::Test {
+protected:
+    std::vector<std::string> temp_files;
+
+    void TearDown() override {
+        for (const auto &f : temp_files) {
+            remove(f.c_str());
+        }
+    }
+};
+
+static void test_encrypt(const char *path, const char *method, mz_stream_create_cb crypt_create,
+                         const char *password, std::vector<std::string> &temp_files) {
     char org_buf[4096];
     char mod_buf[4096];
     int32_t read = 0;
@@ -36,6 +50,9 @@ static void test_encrypt(const char *path, const char *method, mz_stream_create_
 
     snprintf(encrypt_path, sizeof(encrypt_path), "%s.enc.%s", path, method);
     snprintf(decrypt_path, sizeof(decrypt_path), "%s.dec.%s", path, method);
+
+    temp_files.push_back(encrypt_path);
+    temp_files.push_back(decrypt_path);
 
     /* Read file to encrypt into memory buffer */
     in_stream = mz_stream_os_create();
@@ -110,13 +127,13 @@ static void test_encrypt(const char *path, const char *method, mz_stream_create_
 }
 
 #ifdef HAVE_PKCRYPT
-TEST(encrypt, pkcrypt) {
-    test_encrypt("LICENSE", "pkcrypt", mz_stream_pkcrypt_create, "hello");
+TEST_F(encrypt_test, pkcrypt) {
+    test_encrypt("LICENSE", "pkcrypt", mz_stream_pkcrypt_create, "hello", temp_files);
 }
 #endif
 
 #ifdef HAVE_WZAES
-TEST(encrypt, aes) {
-    test_encrypt("LICENSE", "aes", mz_stream_wzaes_create, "hello");
+TEST_F(encrypt_test, aes) {
+    test_encrypt("LICENSE", "aes", mz_stream_wzaes_create, "hello", temp_files);
 }
 #endif
