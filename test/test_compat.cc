@@ -18,6 +18,9 @@
 
 #include <gtest/gtest.h>
 
+#include <string>
+#include <vector>
+
 #if defined(HAVE_ZLIB) || defined(HAVE_LIBCOMP)
 static void test_zip_compat(zipFile zip, const char *filename, int32_t level) {
     int32_t err = ZIP_OK;
@@ -40,7 +43,24 @@ static void test_zip_compat(zipFile zip, const char *filename, int32_t level) {
     EXPECT_EQ(err = zipCloseFileInZip(zip), ZIP_OK) << "failed to close file in zip (err: " << err << ")";
 }
 
-TEST(compat, zip) {
+class compat_test : public ::testing::Test {
+protected:
+    static std::vector<std::string> temp_files;
+
+    static void SetUpTestSuite() {
+        temp_files.push_back("compat.zip");
+    }
+
+    static void TearDownTestSuite() {
+        for (const auto &f : temp_files) {
+            remove(f.c_str());
+        }
+    }
+};
+
+std::vector<std::string> compat_test::temp_files;
+
+TEST_F(compat_test, zip) {
     zipFile zip;
 
     zip = zipOpen64("compat.zip", APPEND_STATUS_CREATE);
@@ -256,7 +276,7 @@ void fill_ioapi64_filefunc(zlib_filefunc64_def *pzlib_filefunc_def) {
     pzlib_filefunc_def->opaque = NULL;
 }
 
-TEST(compat, unzip) {
+TEST_F(compat_test, unzip) {
     unzFile unzip;
 
     unzip = unzOpen("compat.zip");
@@ -266,7 +286,7 @@ TEST(compat, unzip) {
     unzClose(unzip);
 }
 
-TEST(compat, unzip32) {
+TEST_F(compat_test, unzip32) {
     unzFile unzip;
     zlib_filefunc_def zlib_filefunc_def;
 
@@ -278,7 +298,7 @@ TEST(compat, unzip32) {
     unzClose(unzip);
 }
 
-TEST(compat, unzip64) {
+TEST_F(compat_test, unzip64) {
     unzFile unzip;
     zlib_filefunc64_def zlib_filefunc_def;
 
