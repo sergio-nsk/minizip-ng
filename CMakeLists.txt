@@ -428,9 +428,6 @@ if(MZ_ZSTD)
 
         clone_repo(zstd https://github.com/facebook/zstd release)
 
-        # Don't automatically add all targets to the solution
-        add_subdirectory(${ZSTD_SOURCE_DIR}/build/cmake ${ZSTD_BINARY_DIR} EXCLUDE_FROM_ALL)
-
         list(APPEND MINIZIP_INC ${ZSTD_SOURCE_DIR}/lib)
         if(NOT DEFINED BUILD_SHARED_LIBS OR NOT ${BUILD_SHARED_LIBS})
             list(APPEND MINIZIP_DEP libzstd_static)
