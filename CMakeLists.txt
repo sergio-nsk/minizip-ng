@@ -18,16 +18,17 @@ project(minizip-ng
     DESCRIPTION "Zip manipulation library"
 	HOMEPAGE_URL https://github.com/zlib-ng/minizip-ng/)
 
-include(CMakeDependentOption)
-include(CheckLibraryExists)
-include(CheckSymbolExists)
+include(CheckCCompilerFlag)
+include(CheckCSourceCompiles)
 include(CheckFunctionExists)
 include(CheckIncludeFile)
 include(CheckIncludeFiles)
-include(CheckCSourceCompiles)
+include(CheckLibraryExists)
+include(CheckSymbolExists)
 include(CheckTypeSize)
-include(GNUInstallDirs)
+include(CMakeDependentOption)
 include(FeatureSummary)
+include(GNUInstallDirs)
 
 include(cmake/detect-sanitizer.cmake)
 

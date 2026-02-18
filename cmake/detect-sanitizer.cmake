@@ -5,16 +5,16 @@ macro(add_common_sanitizer_flags)
     if(CMAKE_C_COMPILER_ID MATCHES "GNU" OR CMAKE_C_COMPILER_ID MATCHES "Clang")
         add_compile_options(-g3)
     endif()
-    # check_c_compiler_flag(-fno-omit-frame-pointer HAVE_NO_OMIT_FRAME_POINTER)
-    # if(HAVE_NO_OMIT_FRAME_POINTER)
+    check_c_compiler_flag(-fno-omit-frame-pointer HAVE_NO_OMIT_FRAME_POINTER)
+    if(HAVE_NO_OMIT_FRAME_POINTER)
         add_compile_options(-fno-omit-frame-pointer)
         add_link_options(-fno-omit-frame-pointer)
-    # endif()
-    # check_c_compiler_flag(-fno-optimize-sibling-calls HAVE_NO_OPTIMIZE_SIBLING_CALLS)
-    # if(HAVE_NO_OPTIMIZE_SIBLING_CALLS)
+    endif()
+    check_c_compiler_flag(-fno-optimize-sibling-calls HAVE_NO_OPTIMIZE_SIBLING_CALLS)
+    if(HAVE_NO_OPTIMIZE_SIBLING_CALLS)
         add_compile_options(-fno-optimize-sibling-calls)
         add_link_options(-fno-optimize-sibling-calls)
-    # endif()
+    endif()
 endmacro()
 
 macro(check_sanitizer_support known_checks supported_checks)
@@ -111,6 +111,7 @@ endmacro()
 
 macro(add_undefined_sanitizer)
     set(known_checks
+        alignment
         array-bounds
         bool
         bounds
@@ -137,10 +138,6 @@ macro(add_undefined_sanitizer)
         vptr
         )
 
-    # Only check for alignment sanitizer flag if unaligned access is not supported
-    if(NOT WITH_UNALIGNED)
-        list(APPEND known_checks alignment)
-    endif()
     # Object size sanitizer has no effect at -O0 and produces compiler warning if enabled
     if(NOT CMAKE_C_FLAGS MATCHES "-O0")
         list(APPEND known_checks object-size)
@@ -152,12 +149,6 @@ macro(add_undefined_sanitizer)
         message(STATUS "Undefined behavior sanitizer is enabled: ${supported_checks}")
         add_compile_options(-fsanitize=${supported_checks})
         add_link_options(-fsanitize=${supported_checks})
-
-        # Group sanitizer flag -fsanitize=undefined will automatically add alignment, even if
-        # it is not in our sanitize flag list, so we need to explicitly disable alignment sanitizing.
-        if(WITH_UNALIGNED)
-            add_compile_options(-fno-sanitize=alignment)
-        endif()
 
         add_common_sanitizer_flags()
     else()
