@@ -42,12 +42,7 @@ option(MZ_ZLIB "Enables ZLIB compression" ON)
 
 # Controls to select either zlib-ng or zlib
 set(MZ_ZLIB_FLAVOR "auto" CACHE STRING "Select the preferred zlib flavor - auto searches for zlib-ng then zlib")
-set(MZ_ZLIB_FLAVORS "auto" "zlib-ng" "zlib")
-set_property(CACHE MZ_ZLIB_FLAVOR PROPERTY STRINGS ${MZ_ZLIB_FLAVORS})
-
-if(NOT MZ_ZLIB_FLAVOR IN_LIST MZ_ZLIB_FLAVORS)
-    message(FATAL_ERROR "MZ_ZLIB_FLAVOR must be one of ${MZ_ZLIB_FLAVORS}")
-endif()
+set_property(CACHE MZ_ZLIB_FLAVOR PROPERTY STRINGS "auto" "zlib-ng" "zlib")
 
 option(MZ_BZIP2 "Enables BZIP2 compression" ON)
 option(MZ_LZMA "Enables LZMA & XZ compression" ON)
