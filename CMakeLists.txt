@@ -422,7 +422,7 @@ if(MZ_ZSTD)
     elseif(MZ_FETCH_LIBS)
         set(ZSTD_BUILD_PROGRAMS OFF CACHE BOOL "Build zstd programs")
 
-        clone_repo(zstd https://github.com/facebook/zstd release)
+        clone_repo(zstd https://github.com/facebook/zstd release build/cmake)
 
         list(APPEND MINIZIP_INC ${ZSTD_SOURCE_DIR}/lib)
         if(NOT DEFINED BUILD_SHARED_LIBS OR NOT ${BUILD_SHARED_LIBS})
