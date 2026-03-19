@@ -268,8 +268,8 @@ jobs:
       shell: bash
       if: always() && matrix.codecov
       run: |
-        python3 -u -m pip install gcovr
-        python3 -m gcovr \
+        pip install gcovr
+        python -m gcovr \
           --exclude-unreachable-branches \
           --gcov-ignore-parse-errors \
           --gcov-executable "${{ matrix.gcov-exec || 'gcov' }}" \
