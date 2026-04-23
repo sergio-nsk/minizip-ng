@@ -244,6 +244,55 @@ jobs:
         choco uninstall --no-progress strawberryperl
         choco install ninja --no-progress
 
+    - name: Set LLVM_BUILD_DIR for LLVM C++ libraries (MSAN)
+      if: contains(matrix.name, 'MSAN') && startsWith(matrix.compiler, 'clang')
+      run: |
+        echo "LLVM_BUILD_DIR=`pwd`/llvm-project/build" >> $GITHUB_ENV
+
+    - name: Get latest hash change for LLVM C++ libraries (MSAN)
+      if: contains(matrix.name, 'MSAN') && startsWith(matrix.compiler, 'clang')
+      id: llvm-remote-hash
+      run: |
+        HASH=$(git ls-remote https://github.com/llvm/llvm-project refs/heads/release/20.x | cut -f1)
+        if [ -z "$HASH" ]; then
+          echo "Failed to fetch LLVM remote hash"
+          exit 1
+        fi
+        echo "value=$HASH" >> $GITHUB_OUTPUT
+
+    - name: Cache LLVM C++ libraries (MSAN)
+      if: contains(matrix.name, 'MSAN') && startsWith(matrix.compiler, 'clang')
+      id: cache-llvm
+      uses: actions/cache@v5
+      with:
+        path: |
+          ${{ env.LLVM_BUILD_DIR }}/lib
+          ${{ env.LLVM_BUILD_DIR }}/include
+        key: cache-llvm-${{ matrix.os }}-${{ runner.arch }}-${{ matrix.compiler }}-${{ steps.llvm-remote-hash.outputs.value }}
+
+    - name: Compile LLVM C++ libraries (MSAN)
+      if: contains(matrix.name, 'MSAN') && startsWith(matrix.compiler, 'clang') && steps.cache-llvm.outputs.cache-hit != 'true'
+      run: |
+        # Sparse-checkout only the folders we need
+        git clone --depth=1 --filter=blob:none https://github.com/llvm/llvm-project --no-checkout --branch release/20.x
+        cd llvm-project
+        git sparse-checkout set cmake runtimes libc libcxx libcxxabi llvm/cmake
+        git checkout
+        cmake -S runtimes -B build -G Ninja \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DLLVM_ENABLE_RUNTIMES="libcxx;libcxxabi" \
+          -DLLVM_USE_SANITIZER=MemoryWithOrigins \
+          -DLIBCXXABI_USE_LLVM_UNWINDER=OFF \
+          -DLIBCXX_ENABLE_STATIC=OFF \
+          -DLIBCXX_INCLUDE_BENCHMARKS=OFF \
+          -DLLVM_INCLUDE_TESTS=OFF \
+          -DLLVM_INCLUDE_DOCS=OFF
+        cmake --build build -j5 -- cxx cxxabi
+      env:
+        CFLAGS: -O2
+        CC: ${{ matrix.compiler }}
+        CXX: ${{ matrix.cxx-compiler }}
+
     - name: Generate project files
       shell: bash
       run: |

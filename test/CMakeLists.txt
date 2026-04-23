@@ -4,7 +4,20 @@ include(FetchContent)
 
 enable_language(CXX)
 
-if(NOT TARGET GTest::GTest)
+# Google test requires MSAN-instrumented C++ standard library headers and
+# runtime. System libstdc++ and libc++ are not built with MSAN, so building
+# against them produces false positives during gtest static registration.
+# Expect LLVM_BUILD_DIR to point at an out-of-tree build of libc++ +
+# libc++abi compiled with -DLLVM_USE_SANITIZER=MemoryWithOrigins.
+if(MZ_SANITIZER STREQUAL "memory")
+    if(NOT DEFINED ENV{LLVM_BUILD_DIR})
+        message(FATAL_ERROR "MSAN instrumented C++ libraries required!")
+    endif()
+
+    # Must set include and compile options before fetching googletest
+    include_directories($ENV{LLVM_BUILD_DIR}/include $ENV{LLVM_BUILD_DIR}/include/c++/v1)
+    add_compile_options(-stdlib=libc++ -g)
+elseif(NOT TARGET GTest::GTest)
     find_package(GTest QUIET)
 endif()
 
@@ -69,6 +82,14 @@ target_include_directories(gtest_minizip PRIVATE
     ${CMAKE_BINARY_DIR})
 
 target_link_libraries(gtest_minizip MINIZIP::minizip GTest::GTest)
+
+if(MZ_SANITIZER STREQUAL "memory")
+    target_link_directories(gtest_minizip PRIVATE $ENV{LLVM_BUILD_DIR}/lib)
+    target_link_options(gtest_minizip PRIVATE
+        -stdlib=libc++
+        -lc++abi
+        -Wl,-rpath,$ENV{LLVM_BUILD_DIR}/lib)
+endif()
 
 if(MSVC)
     set_target_properties(gtest_minizip PROPERTIES
