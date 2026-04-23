@@ -32,7 +32,9 @@ jobs:
             # System libcrypto is not built with MSAN, which produces
             # false positives inside OPENSSL_init_crypto. Disable MZ_OPENSSL
             # so the MSAN-instrumented built-in crypto is used instead.
-            cmake-args: -GNinja -DMZ_SANITIZER=Memory -DMZ_OPENSSL=OFF
+            # System libz/libbz2/liblzma/libzstd are likewise uninstrumented,
+            # so fetch them and build from source with MSAN flags.
+            cmake-args: -GNinja -DMZ_SANITIZER=Memory -DMZ_OPENSSL=OFF -DMZ_FORCE_FETCH_LIBS=ON
             packages: ninja-build clang-20 llvm-20 libclang-rt-20-dev
             gcov-exec: llvm-cov-20 gcov
             build-config: Debug
