@@ -150,6 +150,11 @@ static Byte reader(void *p) {
     uint8_t b;
     int32_t status;
 
+    if (ppmd->max_total_in > 0 && ppmd->total_in >= ppmd->max_total_in) {
+        ppmd->error = MZ_STREAM_ERROR;
+        return 0;
+    }
+
     if ((status = mz_stream_read_uint8((mz_stream_ppmd *)ppmd->stream.base, &b)) != MZ_OK) {
         ppmd->error = status;
         b = 0;
@@ -309,18 +314,16 @@ int32_t mz_stream_ppmd_read(void *stream, void *buf, int32_t size) {
     mz_stream_ppmd *ppmd = (mz_stream_ppmd *)stream;
     uint8_t *next_out = buf;
     int32_t avail_out;
-    int32_t avail_in = sizeof(ppmd->buffer);
+    int64_t start_in = ppmd->total_in;
+    int64_t avail_in = (ppmd->max_total_in > 0 ? ppmd->max_total_in : INT64_MAX) - start_in;
     int sym = 0;
     int32_t written = 0;
 
     if (ppmd->end_stream)
         return MZ_OK;
 
-    if (ppmd->max_total_in > 0 && avail_in > (ppmd->max_total_in - ppmd->total_in))
-        avail_in = (int32_t)(ppmd->max_total_in - ppmd->total_in);
-
     /* Decode input to fill the output buffer. */
-    for (avail_out = size; avail_out > 0 && avail_in > 0; avail_out--, avail_in--) {
+    for (avail_out = size; avail_out > 0 && avail_in > (ppmd->total_in - start_in); avail_out--) {
         sym = Ppmd8_DecodeSymbol(&ppmd->ppmd8);
 
         /* There are two ways to terminate the loop early:
