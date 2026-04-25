@@ -168,8 +168,8 @@ check_function_exists(symlink HAVE_SYMLINK)
 # Check for fseeko readlink
 check_function_exists(readlink HAVE_READLINK)
 
-configure_file(mz_config.h.cmakein ${CMAKE_CURRENT_SOURCE_DIR}/mz_config.h @ONLY NEWLINE_STYLE UNIX)
-list(APPEND MINIZIP_HDR mz_config.h)
+configure_file(mz_config.h.cmakein ${CMAKE_CURRENT_BINARY_DIR}/mz_config.h @ONLY NEWLINE_STYLE UNIX)
+list(APPEND MINIZIP_HDR ${CMAKE_CURRENT_BINARY_DIR}/mz_config.h)
 
 if(MZ_LIBCOMP)
     if(APPLE)
@@ -763,11 +763,11 @@ target_link_directories(${MINIZIP_TARGET} PUBLIC ${MINIZIP_LBD})
 target_compile_definitions(${MINIZIP_TARGET} PRIVATE ${STDLIB_DEF} ${MINIZIP_DEF})
 target_include_directories(${MINIZIP_TARGET} PRIVATE ${MINIZIP_INC})
 target_include_directories(${MINIZIP_TARGET} PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>)
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>)
 if(MZ_COMPAT)
     target_include_directories(${MINIZIP_TARGET} PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/compat/>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>)
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/compat/>)
 endif()
 
 # Install files

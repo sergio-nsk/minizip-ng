@@ -8,6 +8,3 @@ third_party/
 
 # IDE
 .vscode
-
-# cmake generated
-/mz_config.h
