@@ -32,6 +32,9 @@
 
 #include <gtest/gtest.h>
 
+#ifndef MZ_ZIP_NO_COMPRESSION
+
+#ifndef MZ_ZIP_NO_DECOMPRESSION
 static void test_compare_stream_to_end(void *source1, void *source2) {
     uint8_t source1_buf[4096];
     uint8_t source2_buf[4096];
@@ -49,15 +52,18 @@ static void test_compare_stream_to_end(void *source1, void *source2) {
         EXPECT_EQ(memcmp(source1_buf, source2_buf, source1_read), 0);
     } while (1);
 }
+#endif
 
 static void test_compress(const char *method, mz_stream_create_cb create_compress) {
     int64_t total_in = 0;
     int64_t total_out = 0;
     void *org_stream = NULL;
     void *compress_stream = NULL;
-    void *uncompress_stream = NULL;
     void *deflate_stream = NULL;
+#ifndef MZ_ZIP_NO_DECOMPRESSION
+    void *uncompress_stream = NULL;
     void *inflate_stream = NULL;
+#endif
 
     /* Open file to be compressed */
     org_stream = mz_stream_os_create();
@@ -88,6 +94,7 @@ static void test_compress(const char *method, mz_stream_create_cb create_compres
 
     printf("%s compressed from %u to %u\n", method, (uint32_t)total_in, (uint32_t)total_out);
 
+#ifndef MZ_ZIP_NO_DECOMPRESSION
     /* Decompress data into memory stream */
     uncompress_stream = mz_stream_mem_create();
     ASSERT_NE(uncompress_stream, nullptr);
@@ -121,6 +128,7 @@ static void test_compress(const char *method, mz_stream_create_cb create_compres
 
     mz_stream_mem_close(uncompress_stream);
     mz_stream_mem_delete(&uncompress_stream);
+#endif
 
     mz_stream_mem_close(compress_stream);
     mz_stream_mem_delete(&compress_stream);
@@ -153,4 +161,6 @@ TEST(stream, zlib) {
 TEST(stream, zstd) {
     return test_compress("zstd", mz_stream_zstd_create);
 }
+#endif
+
 #endif
