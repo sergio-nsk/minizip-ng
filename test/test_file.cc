@@ -15,6 +15,7 @@
 #include <fstream>
 #include <cstdio>
 
+#if GTEST_OS_WINDOWS
 TEST(os, get_file_date_ads) {
     const std::string main_stream_name = "minizip_ads_test";
     const std::string ads_name = main_stream_name + ":ads";
@@ -42,3 +43,4 @@ TEST(os, get_file_date_ads) {
     ASSERT_GT(accessed_date, 0);
     ASSERT_GT(creation_date, 0);
 }
+#endif
