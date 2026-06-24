@@ -23,6 +23,8 @@
 #include <vector>
 
 #if defined(HAVE_ZLIB) || defined(HAVE_LIBCOMP)
+
+#ifndef MZ_ZIP_NO_COMPRESSION
 static void test_zip_compat(zipFile zip, const char *filename, int32_t level) {
     int32_t err = ZIP_OK;
     zip_fileinfo file_info;
@@ -43,6 +45,7 @@ static void test_zip_compat(zipFile zip, const char *filename, int32_t level) {
 
     EXPECT_EQ(err = zipCloseFileInZip(zip), ZIP_OK) << "failed to close file in zip (err: " << err << ")";
 }
+#endif
 
 class compat_test : public ::testing::Test {
 protected:
@@ -61,6 +64,7 @@ protected:
 
 std::vector<std::string> compat_test::temp_files;
 
+#ifndef MZ_ZIP_NO_COMPRESSION
 TEST_F(compat_test, zip) {
     zipFile zip;
 
@@ -72,7 +76,9 @@ TEST_F(compat_test, zip) {
 
     zipClose(zip, "test global comment");
 }
+#endif
 
+#if !defined(MZ_ZIP_NO_COMPRESSION) && !defined(MZ_ZIP_NO_DECOMPRESSION)
 static void test_unzip_compat(unzFile unzip) {
     unz_global_info64 global_info64;
     unz_global_info global_info;
@@ -310,4 +316,5 @@ TEST_F(compat_test, unzip64) {
     test_unzip_compat(unzip);
     unzClose(unzip);
 }
+#endif
 #endif

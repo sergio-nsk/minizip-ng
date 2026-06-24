@@ -59,20 +59,15 @@ endif()
 set(TEST_SRCS
     test_crypt.cc
     test_encoding.cc
+    test_file.cc
     test_path.cc
     test_stream.cc
+    test_stream_compress.cc
     test_stream_crypt.cc
     )
 
-if(NOT MZ_COMPRESS_ONLY AND NOT MZ_DECOMPRESS_ONLY)
-    if(MZ_COMPAT)
-        list(APPEND TEST_SRCS test_compat.cc)
-    endif()
-    list(APPEND TEST_SRCS test_stream_compress.cc)
-endif()
-
-if(MSVC)
-    list(APPEND TEST_SRCS test_file.cc)
+if(MZ_COMPAT)
+    list(APPEND TEST_SRCS test_compat.cc)
 endif()
 
 add_executable(gtest_minizip test_main.cc ${TEST_SRCS})
