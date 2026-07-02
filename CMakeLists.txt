@@ -57,6 +57,7 @@ option(MZ_FORCE_FETCH_LIBS "Enables fetching third-party libraries always" OFF)
 option(MZ_PKCRYPT "Enables PKWARE traditional encryption" ON)
 option(MZ_WZAES "Enables WinZIP AES encryption" ON)
 option(MZ_OPENSSL "Enables OpenSSL for encryption" ${UNIX})
+option(MZ_PBKDF2 "Enables Password-Based Key Derivation Function 2" OFF)
 cmake_dependent_option(MZ_LIBBSD "Builds with libbsd crypto random" ON "UNIX" OFF)
 # Character conversion options
 option(MZ_ICONV "Enables iconv for string encoding conversion" ON)
@@ -607,7 +608,15 @@ else()
     endif()
 endif()
 
+if(MZ_WZAES)
+    # WinZIP AES encryption requires PBKDF2
+    set(MZ_PBKDF2 ON)
+endif()
+
 # Setup predefined macros
+if(MZ_PBKDF2)
+    list(APPEND MINIZIP_DEF -DHAVE_PBKDF2)
+endif()
 if(MZ_COMPRESS_ONLY)
     list(APPEND MINIZIP_DEF -DMZ_ZIP_NO_DECOMPRESSION)
 endif()
