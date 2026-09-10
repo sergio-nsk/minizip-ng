@@ -122,7 +122,9 @@ static int32_t mz_stream_ppmd_flush(void *stream) {
     mz_stream_ppmd *ppmd = (mz_stream_ppmd *)stream;
 
     if (ppmd->out.pos) {
-        if (mz_stream_write(ppmd->stream.base, ppmd->out.dst, ppmd->out.pos) != ppmd->out.pos)
+        if (ppmd->out.pos > (size_t)INT32_MAX)
+            return MZ_WRITE_ERROR;
+        if (mz_stream_write(ppmd->stream.base, ppmd->out.dst, (int32_t)ppmd->out.pos) != ppmd->out.pos)
             return MZ_WRITE_ERROR;
         ppmd->total_out += ppmd->out.pos;
         ppmd->out.pos = 0;
