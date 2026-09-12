@@ -65,7 +65,7 @@ TEST_P(path_resolve, os) {
         std::replace(expected_path.begin(), expected_path.end(), '\\', '/');
     }
     mz_path_resolve(path.c_str(), output, sizeof(output));
-    EXPECT_STREQ(output, expected_path.c_str());
+    EXPECT_EQ(output, expected_path);
 }
 
 struct combine_safe_param {
@@ -115,7 +115,7 @@ TEST_P(path_combine_safe, os) {
     int32_t err = mz_path_combine_safe(output, join.c_str(), sizeof(output));
     if (param.expected_path) {
         EXPECT_EQ(err, MZ_OK);
-        EXPECT_STREQ(output, expected_path.c_str());
+        EXPECT_EQ(output, expected_path);
     } else {
         EXPECT_NE(err, MZ_OK);
     }
