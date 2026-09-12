@@ -27,9 +27,7 @@ int32_t mz_path_combine(char *path, const char *join, int32_t max_path) {
     if (!path || !join || !max_path)
         return MZ_PARAM_ERROR;
 
-    path_len = (int32_t)strlen(path);
-
-    if (path_len == 0) {
+    if (*path == 0) {
         strncpy(path, join, max_path - 1);
         path[max_path - 1] = 0;
     } else {
